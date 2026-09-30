@@ -1,12 +1,29 @@
 import { getImgUrl } from "../../utils/get-img-url";
 import tag from "../../assets/tag.svg";
 import Ratting from "../Ratting/Ratting";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import MovieDetailsModal from "../MovieDetailsModal/MovieDetailsModal";
+import { MovieContext } from "../../context";
 
 const MovieCard = ({ movie }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null);
+
+  const { cartData, setCartData } = useContext(MovieContext);
+
+  const handleAddToCart = (e, movie) => {
+    e.stopPropagation();
+
+    const isExisting = cartData.find((item) => item.id === movie.id);
+
+    if (!isExisting) {
+      setCartData([...cartData, movie]);
+    } else {
+      console.error(
+        `The movie ${movie.title} has been already added in the cart!`,
+      );
+    }
+  };
 
   const handleCloseModal = () => {
     setSelectedMovie(null);
@@ -25,7 +42,7 @@ const MovieCard = ({ movie }) => {
       )}
 
       <figure className="p-4 border border-black/10 shadow-sm dark:border-white/10 rounded-xl">
-        <a href="" onClick={() => handleMovieSelected(movie)}>
+        <a href="#" onClick={() => handleMovieSelected(movie)}>
           <img
             className="w-full object-cover"
             src={getImgUrl(movie.cover)}
@@ -42,6 +59,7 @@ const MovieCard = ({ movie }) => {
             <a
               className="bg-primary rounded-lg py-2 px-5 flex items-center justify-center gap-2 text-[#171923] font-semibold text-sm"
               href="#"
+              onClick={(e) => handleAddToCart(e, movie)}
             >
               <img src={tag} alt="" />
               <span>${movie.price} | Add to Cart</span>
